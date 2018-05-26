@@ -1,0 +1,16 @@
+data:
+
+struct stage {
+
+    char *input;
+    char *output;
+    int argc;
+    char **argv;
+
+}
+
+struct stagelist {
+
+    struct stage *stages;
+
+}
