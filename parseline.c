@@ -53,6 +53,8 @@ int main(int argc, char **argv) {
         stage++;
     }
     print_stages(stages);
+    free_stages(stages);
+    free_pipes(pipes);
     return 0;
 }
 
@@ -143,3 +145,23 @@ void print_stages(struct stage *stages) {
     }
 }
 
+/* free all allocated memory in stages */
+void free_stages(struct stage *stages){
+	int i, j;
+	for(i = 0; i < stage_cnt; i++){
+		for(j = 0; j < stages[i].argc; j++){
+			free(stages[i].argv[j]);
+		}
+		free(stages[i].command);
+	}
+	return;
+}
+
+/* free all commands */
+void free_pipes(char *pipes[]){
+	int i;
+	for(i = 0; i < stage_cnt; i++){
+		free(pipes[i]);
+	}
+	return;
+}
