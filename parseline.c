@@ -148,13 +148,13 @@ void print_stages(struct stage *stages) {
             printf("     input: pipe from stage %d\n", stages[i].input);
         }
         if (stages[i].output == -1) {
-            printf("     output: original stdout\n");
+            printf("    output: original stdout\n");
         }
         else if (stages[i].output == -2) {
-            printf("     output: %s\n", stages[i].files[1]);
+            printf("    output: %s\n", stages[i].files[1]);
         }
         else {
-            printf("     output: pipe to stage %d\n", stages[i].output);
+            printf("    output: pipe to stage %d\n", stages[i].output);
         }
         printf("      argc: %d\n", stages[i].argc);
         printf("      argv: ");
