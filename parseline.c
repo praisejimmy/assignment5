@@ -8,15 +8,20 @@
 #define LINE_MAX 512
 #define ARG_MAX 10
 #define PIPE_MAX 10
+#define PATH_MAX 4096
 
-/* contains all information pertaining to stage of a piped command */
+/* contains all information pertaining to stage of a piped command
+input or output as -1 is std in or out respectively,
+input or output as -2 means specific file named
+files[0] is input file files[1] is output file */
 struct stage {
 
     char *command;
-    char input[18];
-    char output[18];
+    int input;
+    int output;
     int argc;
     char *argv[10];
+    char files[2][PATH_MAX];
 
 };
 
@@ -67,21 +72,21 @@ void set_stage(char *cmd, struct stage *stg, int stage) {
     token = strtok(cmd, " ");
 
     if (stage == 0) {
-        strcpy(stg->input, "original stdin");
+        stg->input = -1;
         if (stage_cnt > 1) {
-            strcpy(stg->output, "pipe to stage 1");
+            stg->output = 1;
         }
         else {
-            strcpy(stg->output, "original stdout");
+            stg->output = -1;
         }
     }
     else if (stage != 0) {
-        sprintf(stg->input, "pipe from stage %d", stage - 1);
+        stg->input = stage - 1;
         if (stage == (stage_cnt - 1)) {
-            strcpy(stg->output, "original stdout");
+            stg->output = -1;
         }
         else {
-            sprintf(stg->output, "pipe to stage %d", stage + 1);
+            stg->output = stage + 1;
         }
     }
 
@@ -96,7 +101,8 @@ void set_stage(char *cmd, struct stage *stg, int stage) {
                 fprintf(stderr, "%s: bad input redirection\n", cmd);
                 exit(-1);
             }
-            strcpy(stg->input, token);
+            stg->input = -2;
+            strcpy(stg->files[0], token);
         }
         else if (!strcmp(token, ">")) {
             token = strtok(NULL, " ");
@@ -108,7 +114,8 @@ void set_stage(char *cmd, struct stage *stg, int stage) {
                 fprintf(stderr, "%s: bad output redirection\n", cmd);
                 exit(-1);
             }
-            strcpy(stg->output, token);
+            stg->output = -2;
+            strcpy(stg->files[1], token);
         }
         else {
             if (stg->argc == 10) {
@@ -131,8 +138,24 @@ void print_stages(struct stage *stages) {
         printf("--------\n");
         printf("Stage %d: \"%s\"\n", i, stages[i].command);
         printf("--------\n");
-        printf("     input: %s\n", stages[i].input);
-        printf("    output: %s\n", stages[i].output);
+        if (stages[i].input == -1) {
+            printf("     input: original stdin\n");
+        }
+        else if (stages[i].input == -2) {
+            printf("     input: %s\n", stages[i].files[0]);
+        }
+        else {
+            printf("     input: pipe from stage %d\n", stages[i].input);
+        }
+        if (stages[i].output == -1) {
+            printf("     output: original stdout\n");
+        }
+        else if (stages[i].output == -2) {
+            printf("     output: %s\n", stages[i].files[1]);
+        }
+        else {
+            printf("     output: pipe to stage %d\n", stages[i].output);
+        }
         printf("      argc: %d\n", stages[i].argc);
         printf("      argv: ");
         for (j = 0; j < stages[i].argc; j++) {

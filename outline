@@ -2,10 +2,11 @@ data:
 
 struct stage {
 
-    char *input;
-    char *output;
+    char *command;
+    int input;
+    int output;
     int argc;
-    char **argv;
+    char *argv[10];
 
 }
 
