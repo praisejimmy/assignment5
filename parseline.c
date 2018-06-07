@@ -127,6 +127,7 @@ void set_stage(char *cmd, struct stage *stg, int stage) {
             stg->argv[stg->argc] = malloc(sizeof(char) * (strlen(command) + 1));
             strcpy(stg->argv[stg->argc], command);
             stg->argc++;
+            free(command);
         }
         else {
             if (stg->argc == 10) {
