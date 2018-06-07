@@ -117,6 +117,17 @@ void set_stage(char *cmd, struct stage *stg, int stage) {
             stg->output = -2;
             strcpy(stg->files[1], token);
         }
+        else if(!strncmp(token, "'", 1)) {
+            char *command = malloc(sizeof(char) * (strlen(token)));
+            strcpy(command, token+1);
+            token = strtok(NULL, "'");
+            command = realloc(command, sizeof(char) * (strlen(command) + strlen(token) + 2));
+            strcat(command, " "); /* because strtok got rid of space */
+            strcat(command, token);
+            stg->argv[stg->argc] = malloc(sizeof(char) * (strlen(command) + 1));
+            strcpy(stg->argv[stg->argc], command);
+            stg->argc++;
+        }
         else {
             if (stg->argc == 10) {
                 fprintf(stderr, "%s: too many arguments\n", cmd);
